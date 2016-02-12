@@ -108,6 +108,7 @@ export default Service.extend(Evented, {
         $('.shepherd-modal').removeClass('shepherd-modal');
       });
     }
+    $('[data-id="error"]').remove();
   },
 
   /**
@@ -291,11 +292,15 @@ export default Service.extend(Evented, {
   },
 
   /**
-   * Check for required elements when tours starts (and stops)
+   * Check for required elements when tours starts
    */
   activeChanged: observer('isActive', function() {
-    const tour = this.get('tourObject');
-    if (!this.requiredElementsPresent()) {
+    if (this.get('isActive') && !this.requiredElementsPresent()) {
+      // Remove all steps
+      const tour = this.get('tourObject');
+      tour.steps = [];
+
+      // Add the error step
       tour.addStep('error', {
         buttons: [{
           text: 'Exit',
@@ -306,7 +311,6 @@ export default Service.extend(Evented, {
         title: this.get('errorTitle'),
         text: [this.get('messageForUser')]
       });
-      return;
     }
   }),
 
