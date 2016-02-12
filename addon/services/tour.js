@@ -291,16 +291,10 @@ export default Service.extend(Evented, {
   },
 
   /**
-   * Create a tour object based on the current configuration
+   * Check for required elements when tours starts (and stops)
    */
-  stepsChange: observer('steps', function () {
-    this.initialize();
-    const steps = this.get('steps');
+  activeChanged: observer('isActive', function() {
     const tour = this.get('tourObject');
-    // Return nothing if there are no steps
-    if (isEmpty(steps)) {
-      return;
-    }
     if (!this.requiredElementsPresent()) {
       tour.addStep('error', {
         buttons: [{
@@ -312,6 +306,19 @@ export default Service.extend(Evented, {
         title: this.get('errorTitle'),
         text: [this.get('messageForUser')]
       });
+      return;
+    }
+  }),
+
+  /**
+   * Create a tour object based on the current configuration
+   */
+  stepsChange: observer('steps', function () {
+    this.initialize();
+    const steps = this.get('steps');
+    const tour = this.get('tourObject');
+    // Return nothing if there are no steps
+    if (isEmpty(steps)) {
       return;
     }
 
@@ -347,10 +354,5 @@ export default Service.extend(Evented, {
         }
       });
     });
-    if (this.get('autoStart')) {
-      Ember.run.later(()=> {
-        this.start();
-      });
-    }
   })
 });
